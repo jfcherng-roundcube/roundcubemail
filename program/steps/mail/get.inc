@@ -252,6 +252,25 @@ if (empty($_GET['_thumb']) && $attachment->is_valid()) {
         $filename .= '.' . $extensions[0];
     }
 
+    // text/plain mimetype usually has a wrong US-ASCII charset (jfcherng)
+    if (
+        stripos($mimetype, 'text/plain') === 0
+        && stripos($attachment->charset, 'US-ASCII') === 0
+        && ($charset = mb_detect_encoding(
+            $attachment->body(),
+            array(
+                'UTF-32', 'UTF-16', 'UTF-8',
+                'BIG-5',
+                'GB18030', 'GB2312',
+                'JIS', 'Shift-JIS',
+                'ASCII',
+            ),
+            true
+        ))
+    ) {
+        $attachment->charset = $charset;
+    }
+
     $OUTPUT->download_headers($filename, array(
             'type'         => $mimetype,
             'type_charset' => $attachment->charset,
