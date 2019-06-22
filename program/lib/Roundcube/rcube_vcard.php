@@ -192,7 +192,7 @@ class rcube_vcard
                     $key     = $col;
                     $subtype = '';
 
-                    if (!empty($raw['type'])) {
+                    if (is_array($raw['type']) && !empty($raw['type'])) {
                         $raw['type'] = array_map('strtolower', $raw['type']);
 
                         $combined = implode(',', array_diff($raw['type'], array('internet', 'pref')));
