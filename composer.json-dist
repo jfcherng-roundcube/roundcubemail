@@ -26,6 +26,21 @@
     },
     "suggest": {
         "kolab/net_ldap3": "~1.1.1 required for connecting to LDAP",
-        "mkopinsky/zxcvbn-php": "^4.4.2 required for Zxcvbn password strength driver"
+        "mkopinsky/zxcvbn-php": "^4.4.2 required for Zxcvbn password strength driver",
+        "ayesh/composer-preload": "~0.0.8 required for composer-preload.sh"
+    },
+    "extra": {
+        "preload": {
+            "paths": [
+                "plugins",
+                "program",
+                "vendor"
+            ],
+            "exclude": [
+            ],
+            "extensions": ["php"],
+            "exclude-regex": "~ test\\.php$ | /(doc|example|stub|test)s?/ ~xi",
+            "no-status-check": false
+        }
     }
 }
