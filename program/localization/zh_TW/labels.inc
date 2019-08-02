@@ -169,6 +169,7 @@ $labels['expand-all'] = '全部展開';
 $labels['expand-unread'] = '展開未讀取';
 $labels['collapse-all'] = '全部收起';
 $labels['threaded'] = '郵件串';
+$labels['showunread'] = '只顯示未讀郵件';
 $labels['autoexpand_threads'] = '展開郵件串';
 $labels['do_expand'] = '所有郵件串';
 $labels['expand_only_unread'] = '只展開未讀郵件';

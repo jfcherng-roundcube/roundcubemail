@@ -168,6 +168,7 @@ $labels['expand-all'] = '展开全部';
 $labels['expand-unread'] = '展开未读';
 $labels['collapse-all'] = '收起全部';
 $labels['threaded'] = '所有邮件';
+$labels['showunread'] = '只显示未读邮件';
 $labels['autoexpand_threads'] = '展开消息主题';
 $labels['do_expand'] = '所有主题';
 $labels['expand_only_unread'] = '仅未读消息';
