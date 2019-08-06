@@ -190,7 +190,7 @@ function rcmail_message_attachments($attrib)
     $out = $ol = '';
     $attachments = array();
 
-    if (count($MESSAGE->attachments)) {
+    if (is_array($MESSAGE->attachments) && count($MESSAGE->attachments)) {
         foreach ($MESSAGE->attachments as $attach_prop) {
             $filename = rcmail_attachment_name($attach_prop, true);
             $filesize = $RCMAIL->message_part_size($attach_prop);
