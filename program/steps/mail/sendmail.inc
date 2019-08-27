@@ -50,6 +50,8 @@ $SENDMAIL  = new rcmail_sendmail($COMPOSE, array(
 // Collect input for message headers
 $headers = $SENDMAIL->headers_input();
 
+// always make $COMPOSE['attachments'] an array
+$COMPOSE['attachments'] = (array) (isset($COMPOSE['attachments']) ? $COMPOSE['attachments'] : null);
 $COMPOSE['param']['message-id'] = $headers['Message-ID'];
 
 $message_id      = $headers['Message-ID'];
