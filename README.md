@@ -4,6 +4,17 @@ Roundcube Webmail
 
 [![Build Status](https://api.travis-ci.org/roundcube/roundcubemail.svg?branch=master)](https://travis-ci.org/roundcube/roundcubemail)
 
+
+修改
+----
+
+- [針對 中日韓 區域修復附件預覽亂碼](https://github.com/jfcherng/roundcubemail/commit/2a5eb74d52f85cd67fef0f1bc241baabbcad9ec3)
+- [允許在主題的語法中使用巢狀條件判斷](https://github.com/jfcherng/roundcubemail/commit/624e039e4504e149f67ccab96605c0fea34c78ce)
+- [Apache 優先使用 Brotli 壓縮演算法（如果可能的話）而非 GZIP](https://github.com/jfcherng/roundcubemail/commit/b53989df4d7ec0d8f947f2e65aef121b4a5db05c)
+- [新增 `bin/build-from-source.sh` 用於一鍵編譯 JS/CSS 檔案](https://github.com/jfcherng/roundcubemail/commit/70dfd3b0bcc73e0ccb519466528063e05ba86637)
+- 其他偶然遇到的 PHP 語法問題修正（notice, warning, deprecation...）
+
+
 ATTENTION
 ---------
 This is just a snapshot from the GIT repository and is **NOT A STABLE
