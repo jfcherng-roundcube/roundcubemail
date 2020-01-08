@@ -312,6 +312,12 @@ EOF;
             return false;
         }
 
+        $skins_allowed = $this->config->get('skins_allowed');
+
+        if (!empty($skins_allowed) && !in_array($skin, (array) $skins_allowed)) {
+            return false;
+        }
+
         $path = RCUBE_INSTALL_PATH . 'skins/';
 
         return !empty($skin) && is_dir($path . $skin) && is_readable($path . $skin);
@@ -1803,7 +1809,7 @@ EOF;
     public function add_script($script, $position = 'head')
     {
         if (!isset($this->scripts[$position])) {
-            $this->scripts[$position] = "\n" . rtrim($script);
+            $this->scripts[$position] = rtrim($script);
         }
         else {
             $this->scripts[$position] .= "\n" . rtrim($script);
@@ -1865,7 +1871,7 @@ EOF;
 
         // put docready commands into page footer
         if (!empty($this->scripts['docready'])) {
-            $this->add_script('$(function(){ ' . $this->scripts['docready'] . "\n});", 'foot');
+            $this->add_script("\$(function() {\n" . $this->scripts['docready'] . "\n});", 'foot');
         }
 
         $page_header = '';

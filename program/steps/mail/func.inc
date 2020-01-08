@@ -839,12 +839,10 @@ function rcmail_wash_html($html, $p, $cid_replaces = array())
     // washtml's DOMDocument methods cannot work without that
     $meta = '<meta charset="'.RCUBE_CHARSET.'" />';
 
-    // remove old meta tag and add the new one, making sure
-    // that it is placed in the head (#1488093)
-    $html = preg_replace('/<meta[^>]+charset=[a-z0-9_"-]+[^>]*>/Ui', $meta, $html, -1, $rcount);
-    if (!$rcount) {
-        $html = preg_replace('/(<head[^>]*>)/Ui', '\\1'.$meta, $html, -1, $rcount);
-    }
+    // remove old meta tag and add the new one, making sure that it is placed in the head (#3510, #7116)
+    $html = preg_replace('/<meta[^>]+charset=[a-z0-9_"-]+[^>]*>/Ui', '', $html, -1);
+    $html = preg_replace('/(<head[^>]*>)/Ui', '\\1'.$meta, $html, -1, $rcount);
+
     if (!$rcount) {
         // Note: HTML without <html> tag may still be a valid input (#6713)
         if (($pos = stripos($html, '<html')) === false) {
@@ -1125,6 +1123,12 @@ function rcmail_html4inline($body, &$args)
         if ($m[1] && preg_match('/bgcolor=["\']*([a-z0-9#]+)["\']*/i', $attrs, $mb)) {
             $style['background-color'] = $mb[1];
             $attrs = preg_replace('/\s?bgcolor=["\']*[a-z0-9#]+["\']*/i', '', $attrs);
+        }
+
+        // Get text color, we'll set it as font color of the message container
+        if ($m[1] && preg_match('/text=["\']*([a-z0-9#]+)["\']*/i', $attrs, $mb)) {
+            $style['color'] = $mb[1];
+            $attrs = preg_replace('/\s?text=["\']*[a-z0-9#]+["\']*/i', '', $attrs);
         }
 
         // Get background, we'll set it as background-image of the message container
@@ -1704,11 +1708,11 @@ function rcmail_message_import_form($attrib = array())
     $input_attr  = array(
         'multiple' => true,
         'name'     => '_file[]',
-        'accept'   => '.eml, .mbox, .msg, message/rfc822, text/*',
+        'accept'   => '.eml,.mbox,.msg,message/rfc822,text/*',
     );
 
     if (class_exists('ZipArchive', false)) {
-        $input_attr['accept'] .= '.zip, application/zip, application/x-zip';
+        $input_attr['accept'] .= '.zip,application/zip,application/x-zip';
         $description          .= ' ' . $RCMAIL->gettext('mailimportzip');
     }
 

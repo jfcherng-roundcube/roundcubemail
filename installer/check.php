@@ -31,6 +31,8 @@ $required_php_exts = array(
     'PDO'       => 'PDO',
     'Multibyte' => 'mbstring',
     'OpenSSL'   => 'openssl',
+    'Filter'    => 'filter',
+    'Ctype'     => 'ctype',
 );
 
 $optional_php_exts = array(
@@ -87,6 +89,8 @@ $source_urls = array(
     'GD'        => 'http://www.php.net/manual/en/book.image.php',
     'Imagick'   => 'http://www.php.net/manual/en/book.imagick.php',
     'Zip'       => 'http://www.php.net/manual/en/book.zip.php',
+    'Filter'    => 'http://www.php.net/manual/en/book.filter.php',
+    'Ctype'     => 'http://www.php.net/manual/en/book.ctype.php',
     'pdo_mysql'   => 'http://www.php.net/manual/en/ref.pdo-mysql.php',
     'pdo_pgsql'   => 'http://www.php.net/manual/en/ref.pdo-pgsql.php',
     'pdo_sqlite'  => 'http://www.php.net/manual/en/ref.pdo-sqlite.php',

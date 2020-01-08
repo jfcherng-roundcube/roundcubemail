@@ -134,7 +134,8 @@ $config['redis_debug'] = false;
 // The IMAP host chosen to perform the log-in.
 // Leave blank to show a textbox at login, give a list of hosts
 // to display a pulldown menu or set one host as string.
-// To use SSL/TLS connection, enter hostname with prefix ssl:// or tls://
+// Enter hostname with prefix ssl:// to use Implicit TLS, or use
+// prefix tls:// to use STARTTLS.
 // Supported replacement variables:
 // %n - hostname ($_SERVER['SERVER_NAME'])
 // %t - hostname without the first part
@@ -257,8 +258,8 @@ $config['messages_cache_threshold'] = 50;
 // ----------------------------------
 
 // SMTP server host (for sending mails).
-// Enter hostname with prefix tls:// to use STARTTLS, or use
-// prefix ssl:// to use the deprecated SSL over SMTP (aka SMTPS)
+// Enter hostname with prefix ssl:// to use Implicit TLS, or use
+// prefix tls:// to use STARTTLS.
 // Supported replacement variables:
 // %h - user's IMAP hostname
 // %n - hostname ($_SERVER['SERVER_NAME'])
@@ -268,7 +269,7 @@ $config['messages_cache_threshold'] = 50;
 // For example %n = mail.domain.tld, %t = domain.tld
 $config['smtp_server'] = 'localhost';
 
-// SMTP port (default is 587)
+// SMTP port. Use 25 for cleartext, 465 for Implicit TLS, or 587 for STARTTLS (default)
 $config['smtp_port'] = 587;
 
 // SMTP username (if required) if you use %u as the username Roundcube
@@ -1079,10 +1080,11 @@ $config['contact_search_name'] = '{name} <{email}>';
 // Use this charset as fallback for message decoding
 $config['default_charset'] = 'ISO-8859-1';
 
-// skin name: folder from skins/
+// Skin name: folder from skins/
 $config['skin'] = 'elastic';
 
-// limit skins available/shown in the settings section
+// Limit skins available for the user.
+// Note: When not empty, it should include the default skin set in 'skin' option.
 $config['skins_allowed'] = array();
 
 // Enables using standard browser windows (that can be handled as tabs)
