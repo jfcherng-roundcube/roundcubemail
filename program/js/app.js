@@ -811,7 +811,7 @@ function rcube_webmail()
     if (ret === false)
       return false;
 
-    if (obj || this.command_aborted === true)
+    if ((obj && ret !== true) || this.command_aborted === true)
       return false;
 
     return true;
@@ -7597,6 +7597,10 @@ function rcube_webmail()
     row = row.show().get(0);
     if (row.scrollIntoView)
       row.scrollIntoView(false);
+
+    // Let skins to do their magic, e.g. Elastic will fix pretty checkbox
+    if (!refrow)
+      this.triggerEvent('clonerow', {row: row, id: id});
 
     return row;
   };

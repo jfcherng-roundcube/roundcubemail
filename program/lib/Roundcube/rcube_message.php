@@ -124,7 +124,7 @@ class rcube_message
         }
 
         $this->mime    = new rcube_mime($this->headers->charset);
-        $this->subject = $this->headers->get('subject');
+        $this->subject = str_replace("\n", '', $this->headers->get('subject'));
         $from          = $this->mime->decode_address_list($this->headers->from, 1);
         $this->sender  = current($from);
 
@@ -876,6 +876,13 @@ class rcube_message
                         $mail_part->filename = 'calendar.ics';
                     }
 
+                    $this->add_part($mail_part, 'attachment');
+                }
+                // Last resort, non-inline and non-text part of multipart/mixed message (#7117)
+                else if ($mimetype == 'multipart/mixed'
+                    && $mail_part->disposition != 'inline'
+                    && $primary_type && $primary_type != 'text' && $primary_type != 'multipart'
+                ) {
                     $this->add_part($mail_part, 'attachment');
                 }
             }

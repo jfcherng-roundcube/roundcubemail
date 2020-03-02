@@ -146,6 +146,7 @@ rcube_webmail.prototype.enigma_import_success = function()
 // Display key(s) generation form
 rcube_webmail.prototype.enigma_key_create = function()
 {
+    this.keys_list.clear_selection();
     this.enigma_loadframe('&_action=plugin.enigmakeys&_a=create&_nav=hide');
 };
 
@@ -346,7 +347,7 @@ rcube_webmail.prototype.enigma_keylist_select = function(list)
 {
     var id = list.get_single_selection(), url;
 
-    if (id)
+    if (id && !list.multi_selecting)
         url = '&_action=plugin.enigmakeys&_a=info&_id=' + id;
 
     this.enigma_loadframe(url);
@@ -668,7 +669,7 @@ rcube_webmail.prototype.enigma_key_not_found = function(data)
             text: rcmail.get_label('enigma.sendunencrypted'),
             click: function(e) {
                 $(this).remove();
-                $('#enigmaencryptopt').prop('checked', false);
+                $('#enigmaencryptopt').prop('checked', false).change();
                 rcmail.command('send', {nocheck: true}, e.target, e.originalEvent);
             }
         });

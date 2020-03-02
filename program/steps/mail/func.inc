@@ -510,7 +510,7 @@ function rcmail_js_message_list($a_headers, $insert_top=false, $a_show_cols=null
             else if ($col == 'subject') {
                 $cont = trim(rcube_mime::decode_header($header->$col, $header->charset));
                 if (!$cont) $cont = $RCMAIL->gettext('nosubject');
-                $cont = rcube::Q($cont);
+                $cont = rcube::SQ($cont);
             }
             else if ($col == 'size')
                 $cont = $RCMAIL->show_bytes($header->$col);
@@ -523,10 +523,10 @@ function rcmail_js_message_list($a_headers, $insert_top=false, $a_show_cols=null
                     $last_folder_name = str_replace($delimiter, " \xC2\xBB ", $last_folder_name);
                 }
 
-                $cont = rcube::Q($last_folder_name);
+                $cont = rcube::SQ($last_folder_name);
             }
             else
-                $cont = rcube::Q($header->$col);
+                $cont = rcube::SQ($header->$col);
 
             $a_msg_cols[$col] = $cont;
         }
@@ -1280,6 +1280,7 @@ function rcmail_address_string($input, $max=null, $linked=false, $addicon=null, 
     $j   = 0;
     $out = '';
     $allvalues  = array();
+    $shown_addresses = array();
     $show_email = $RCMAIL->config->get('message_show_email');
 
     if ($addicon && !isset($_SESSION['writeable_abook'])) {
@@ -1307,7 +1308,7 @@ function rcmail_address_string($input, $max=null, $linked=false, $addicon=null, 
         $mailto = rcube_utils::idn_to_utf8($mailto);
 
         if ($PRINT_MODE) {
-            $address = sprintf('%s &lt;%s&gt;', rcube::Q($name), rcube::Q($mailto));
+            $address = sprintf('%s &lt;%s&gt;', rcube::SQ($name), rcube::Q($mailto));
         }
         else if ($valid) {
             if ($linked) {
@@ -1319,10 +1320,10 @@ function rcmail_address_string($input, $max=null, $linked=false, $addicon=null, 
                 );
 
                 if ($show_email && $name && $mailto) {
-                    $content = rcube::Q($name ? sprintf('%s <%s>', $name, $mailto) : $mailto);
+                    $content = rcube::SQ($name ? sprintf('%s <%s>', $name, $mailto) : $mailto);
                 }
                 else {
-                    $content = rcube::Q($name ?: $mailto);
+                    $content = rcube::SQ($name ?: $mailto);
                     $attrs['title'] = $mailto;
                 }
 
@@ -1330,7 +1331,7 @@ function rcmail_address_string($input, $max=null, $linked=false, $addicon=null, 
             }
             else {
                 $address = html::span(array('title' => $mailto, 'class' => "rcmContactAddress"),
-                    rcube::Q($name ?: $mailto));
+                    rcube::SQ($name ?: $mailto));
             }
 
             if ($addicon && $_SESSION['writeable_abook']) {
@@ -1363,6 +1364,7 @@ function rcmail_address_string($input, $max=null, $linked=false, $addicon=null, 
 
         if (!$moreadrs) {
             $out .= ($out ? ', ' : '') . $address;
+            $shown_addresses[] = $address;
         }
 
         if ($max && $j == $max && $c > $j) {
@@ -1385,13 +1387,13 @@ function rcmail_address_string($input, $max=null, $linked=false, $addicon=null, 
                     'class'   => 'morelink',
                     'onclick' => '$(this).hide().next().show()',
                 ), $label)
-                . html::span(array('style' => 'display:none'), join(', ', $allvalues));
+                . html::span(array('style' => 'display:none'), join(', ', array_diff($allvalues, $shown_addresses)));
         }
         else {
             $out .= ' ' . html::a(array(
                     'href'    => '#more',
                     'class'   => 'morelink',
-                    'onclick' => sprintf("return %s.show_popup_dialog('%s','%s')",
+                    'onclick' => sprintf("return %s.simple_dialog('%s','%s',null,{cancel_button:'close'})",
                         rcmail_output::JS_OBJECT_NAME,
                         rcube::JQ(join(', ', $allvalues)),
                         rcube::JQ($title))
