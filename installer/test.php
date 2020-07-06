@@ -139,7 +139,7 @@ if ($RCI->configured) {
         else {
             $RCI->fail('DSN (write)', $db_error_msg);
             echo '<p class="hint">Make sure that the configured database exists and that the user has write privileges<br />';
-            echo 'DSN: ' . $RCI->config['db_dsnw'] . '</p>';
+            echo 'DSN: ' . rcube::Q($RCI->config['db_dsnw']) . '</p>';
         }
     }
     else {
@@ -190,7 +190,9 @@ if ($db_working) {
 // more database tests
 if ($db_working) {
     // Using transactions to workaround SQLite bug (#7064)
-    $DB->startTransaction();
+    if ($DB->db_provider == 'sqlite') {
+        $DB->startTransaction();
+    }
 
     // write test
     $insert_id = md5(uniqid());
@@ -208,7 +210,9 @@ if ($db_working) {
     echo '<br />';
 
     // Transaction end
-    $DB->rollbackTransaction();
+    if ($DB->db_provider == 'sqlite') {
+        $DB->rollbackTransaction();
+    }
 
     // check timezone settings
     $tz_db = 'SELECT ' . $DB->unixtimestamp($DB->now()) . ' AS tz_db';
@@ -266,9 +270,15 @@ if ($user == '%u') {
     $user_field = new html_inputfield(array('name' => '_smtp_user', 'id' => 'smtp_user'));
     $user = $user_field->show($_POST['_smtp_user']);
 }
+else {
+    $user = html::quote($user);
+}
 if ($pass == '%p') {
     $pass_field = new html_passwordfield(array('name' => '_smtp_pass', 'id' => 'smtp_pass'));
     $pass = $pass_field->show();
+}
+else {
+    $pass = html::quote($pass);
 }
 
 ?>
@@ -280,11 +290,11 @@ if ($pass == '%p') {
 <tbody>
   <tr>
     <td><label for="smtp_server">Server</label></td>
-    <td><?php echo rcube_utils::parse_host($RCI->getprop('smtp_server', 'localhost')); ?></td>
+    <td><?php echo rcube::Q(rcube_utils::parse_host($RCI->getprop('smtp_server', 'localhost'))); ?></td>
   </tr>
   <tr>
     <td><label for="smtp_port">Port</label></td>
-    <td><?php echo $RCI->getprop('smtp_port'); ?></td>
+    <td><?php echo rcube::Q($RCI->getprop('smtp_port')); ?></td>
   </tr>
   <tr>
     <td><label for="smtp_user">Username</label></td>

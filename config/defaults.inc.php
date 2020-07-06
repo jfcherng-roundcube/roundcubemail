@@ -537,6 +537,7 @@ $config['x_frame_options'] = 'sameorigin';
 // This key is used for encrypting purposes, like storing of imap password
 // in the session. For historical reasons it's called DES_key, but it's used
 // with any configured cipher_method (see below).
+// For the default cipher_method a required key length is 24 characters.
 $config['des_key'] = 'rcmail-!24ByteDESkey*Str';
 
 // Encryption algorithm. You can use any method supported by OpenSSL.
@@ -647,9 +648,12 @@ $config['identities_level'] = 0;
 $config['identity_image_size'] = 64;
 
 // Mimetypes supported by the browser.
-// attachments of these types will open in a preview window
-// either a comma-separated list or an array: 'text/plain,text/html,text/xml,image/jpeg,image/gif,image/png,application/pdf'
-$config['client_mimetypes'] = null;  # null == default
+// Attachments of these types will open in a preview window.
+// Either a comma-separated list or an array. Default list includes:
+//     text/plain,text/html,
+//     image/jpeg,image/gif,image/png,image/bmp,image/tiff,image/webp,
+//     application/x-javascript,application/pdf,application/x-shockwave-flash
+$config['client_mimetypes'] = null;
 
 // Path to a local mime magic database file for PHPs finfo extension.
 // Set to null if the default path should be used.
@@ -840,8 +844,8 @@ $config['compose_responses_static'] = array(
 );
 
 // List of HKP key servers for PGP public key lookups in Enigma/Mailvelope
-// Default: array("keys.fedoraproject.org", "keybase.io")
-$config['keyservers'] = array();
+// Note: Lookup is client-side, so the server must support Cross-Origin Resource Sharing
+$config['keyservers'] = array('keys.openpgp.org');
 
 // ----------------------------------
 // ADDRESSBOOK SETTINGS

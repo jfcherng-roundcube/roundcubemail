@@ -405,16 +405,8 @@ function rcube_webmail()
           this.enable_command('image-scale', 'image-rotate', !!/^image\//.test(this.env.mimetype));
 
           // Mozilla's PDF.js viewer does not allow printing from host page (#5125)
-          // to minimize user confusion we disable the Print button
-          if (bw.mz && this.env.mimetype == 'application/pdf') {
-            n = 0; // there will be two onload events, first for the preload page
-            $(this.gui_objects.messagepartframe).on('load', function() {
-              if (n++) try { if (this.contentWindow.document) ref.enable_command('print', true); }
-                catch (e) {/* ignore */}
-            });
-          }
-          else
-            this.enable_command('print', true);
+          // to minimize user confusion we disable the Print button on Firefox < 75
+          this.enable_command('print', this.env.mimetype != 'application/pdf' || !bw.mz || bw.vendver >= 75);
 
           if (this.env.is_message) {
             this.enable_command('reply', 'reply-all', 'edit', 'viewsource',
@@ -735,7 +727,7 @@ function rcube_webmail()
   /*********************************************************/
 
   // execute a specific command on the web client
-  this.command = function(command, props, obj, event)
+  this.command = function(command, props, obj, event, allow_disabled)
   {
     var ret;
 
@@ -753,7 +745,7 @@ function rcube_webmail()
     }
 
     // command not supported or allowed
-    if (!this.commands[command]) {
+    if (!allow_disabled && !this.commands[command]) {
       // pass command to parent window
       if (this.is_framed())
         parent.rcmail.command(command, props);
@@ -3198,12 +3190,13 @@ function rcube_webmail()
   this.copy_messages = function(mbox, event, uids)
   {
     if (mbox && typeof mbox === 'object') {
+      if (mbox.uids) uids = mbox.uids;
       mbox = mbox.id;
     }
     else if (!mbox) {
       uids = this.env.uid ? [this.env.uid] : this.message_list.get_selection();
-      return this.folder_selector(event, function(folder) {
-        ref.copy_messages(folder, null, uids);
+      return this.folder_selector(event, function(folder, obj) {
+        ref.command('copy', {id: folder, uids: uids}, obj, event, true);
       });
     }
 
@@ -3225,12 +3218,13 @@ function rcube_webmail()
   this.move_messages = function(mbox, event, uids)
   {
     if (mbox && typeof mbox === 'object') {
+      if (mbox.uids) uids = mbox.uids;
       mbox = mbox.id;
     }
     else if (!mbox) {
       uids = this.env.uid ? [this.env.uid] : this.message_list.get_selection();
-      return this.folder_selector(event, function(folder) {
-        ref.move_messages(folder, null, uids);
+      return this.folder_selector(event, function(folder, obj) {
+        ref.command('move', {id: folder, uids: uids}, obj, event, true);
       });
     }
 
@@ -3905,7 +3899,7 @@ function rcube_webmail()
     $.each(['to', 'cc', 'bcc'], function(i,field) {
       var pos, rcpt, val = $.trim($('[name="_' + field + '"]').val());
       while (val.length && rcube_check_email(val, true)) {
-        rcpt = RegExp.$2;
+        rcpt = RegExp.$2.replace(/^<+/, '').replace(/>+$/, '');
         recipients.push(rcpt);
         val = val.substr(val.indexOf(rcpt) + rcpt.length + 1).replace(/^\s*,\s*/, '');
       }
@@ -4021,7 +4015,7 @@ function rcube_webmail()
       ref.display_message(error.message, 'error');
     };
 
-    mailvelope.createDisplayContainer(selector, data, keyring, { showExternalContent: this.env.safemode }).then(function(status) {
+    mailvelope.createDisplayContainer(selector, data, keyring, { senderAddress: this.env.sender }).then(function(status) {
       if (status.error && status.error.message) {
         return error_handler(status.error);
       }
@@ -6078,10 +6072,10 @@ function rcube_webmail()
     input.value = pre + to + end;
 
     // set caret to insert pos
-    this.set_caret_pos(input, p + to.length);
+    this.set_caret_pos(input, cpos + to.length - from.length);
 
     // run onchange action on the element
-    $(input).change();
+    $(input).trigger('change', [true]);
   };
 
   this.ksearch_click = function(node)
@@ -6758,7 +6752,7 @@ function rcube_webmail()
     var key = 'G'+prop.source+prop.id,
       link = $('<a>').attr({href: '#', rel: prop.source + ':' + prop.id})
         .click(function() { return ref.command('listgroup', prop, this); })
-        .html(prop.name);
+        .text(prop.name);
 
     this.env.contactfolders[key] = this.env.contactgroups[key] = prop;
     this.treelist.insert({ id:key, html:link, classes:['contactgroup'] }, prop.source, 'contactgroup');
@@ -6794,11 +6788,11 @@ function rcube_webmail()
       newnode.id = newkey;
       newnode.html = $('<a>').attr({href: '#', rel: prop.source + ':' + prop.newid})
         .click(function() { return ref.command('listgroup', newprop, this); })
-        .html(prop.name);
+        .text(prop.name);
     }
     // update displayed group name
     else {
-      $(this.treelist.get_item(key)).children().first().html(prop.name);
+      $(this.treelist.get_item(key)).children().first().text(prop.name);
       this.env.contactfolders[key].name = this.env.contactgroups[key].name = prop.name;
 
       if (prop.source == this.env.source && prop.id == this.env.group)

@@ -521,7 +521,10 @@ class rcube_washtml
                         $xpath = new DOMXPath($node->ownerDocument);
                         foreach ($xpath->query('namespace::*') as $ns) {
                             if ($ns->nodeName != 'xmlns:xml') {
-                                $dump .= ' ' . $ns->nodeName . '="' . $ns->nodeValue . '"';
+                                $dump .= sprintf(' %s="%s"',
+                                    $ns->nodeName,
+                                    htmlspecialchars($ns->nodeValue, ENT_QUOTES, $this->config['charset'])
+                                );
                             }
                         }
                     }
@@ -548,9 +551,6 @@ class rcube_washtml
                 break;
 
             case XML_CDATA_SECTION_NODE:
-                $dump .= $node->nodeValue;
-                break;
-
             case XML_TEXT_NODE:
                 $dump .= htmlspecialchars($node->nodeValue, ENT_COMPAT | ENT_HTML401 | ENT_SUBSTITUTE, $this->config['charset']);
                 break;
@@ -591,11 +591,15 @@ class rcube_washtml
         $this->max_nesting_level = (int) @ini_get('xdebug.max_nesting_level');
 
         // SVG need to be parsed as XML
-        $this->is_xml = stripos($html, '<html') === false && stripos($html, '<svg') !== false;
+        $this->is_xml = !preg_match('/<(html|head|body)/i', $html) && stripos($html, '<svg') !== false;
         $method       = $this->is_xml ? 'loadXML' : 'loadHTML';
 
         // DOMDocument does not support HTML5, try Masterminds parser if available
-        if (!$this->is_xml && class_exists('Masterminds\HTML5')) {
+        if (!$this->is_xml && class_exists('Masterminds\HTML5')
+            // HTML5 parser is slow with content that contains a lot of tags
+            // disable it for such cases (https://github.com/Masterminds/html5-php/issues/181)
+            && substr_count($html, '<') < 10000
+        ) {
             try {
                 $html5 = new Masterminds\HTML5();
                 $node  = $html5->loadHTML($this->fix_html5($html));

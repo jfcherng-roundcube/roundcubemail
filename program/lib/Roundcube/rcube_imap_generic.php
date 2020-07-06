@@ -221,6 +221,38 @@ class rcube_imap_generic
     }
 
     /**
+     * Reads a line of data from the connection stream inluding all
+     * string continuation literals.
+     *
+     * @param int $size Buffer size
+     *
+     * @return string Line of text response
+     */
+    protected function readFullLine($size = 1024)
+    {
+        $line = $this->readLine($size);
+
+        // include all string literels untile the real end of "line"
+        while (preg_match('/\{([0-9]+)\}\r\n$/', $line, $m)) {
+            $bytes = $m[1];
+            $out   = '';
+
+            while (strlen($out) < $bytes) {
+                $out = $this->readBytes($bytes);
+                if ($out === null) {
+                    break;
+                }
+
+                $line .= $out;
+            }
+
+            $line .= $this->readLine($size);
+        }
+
+        return $line;
+    }
+
+    /**
      * Reads more data from the connection stream when provided
      * data contain string literal
      *
@@ -1710,7 +1742,7 @@ class rcube_imap_generic
      *
      * @param array $items Client identification information key/value hash
      *
-     * @return array Server identification information key/value hash
+     * @return array|false Server identification information key/value hash, False on error
      * @since 0.6
      */
     public function id($items = array())
@@ -1729,10 +1761,12 @@ class rcube_imap_generic
         if ($code == self::ERROR_OK && $response) {
             $response = substr($response, 5); // remove prefix "* ID "
             $items    = $this->tokenizeResponse($response, 1);
-            $result   = null;
+            $result   = array();
 
-            for ($i=0, $len=count($items); $i<$len; $i += 2) {
-                $result[$items[$i]] = $items[$i+1];
+            if (is_array($items)) {
+                for ($i=0, $len=count($items); $i<$len; $i += 2) {
+                    $result[$items[$i]] = $items[$i+1];
+                }
             }
 
             return $result;
@@ -2397,7 +2431,7 @@ class rcube_imap_generic
         }
 
         do {
-            $line = $this->readLine(4096);
+            $line = $this->readFullLine(4096);
 
             if (!$line) {
                 break;
@@ -2420,27 +2454,6 @@ class rcube_imap_generic
                 $lines   = array();
                 $line    = substr($line, strlen($m[0]) + 2);
                 $ln      = 0;
-
-                // get complete entry
-                while (preg_match('/\{([0-9]+)\}\r\n$/', $line, $m)) {
-                    $bytes = $m[1];
-                    $out   = '';
-
-                    while (strlen($out) < $bytes) {
-                        $out = $this->readBytes($bytes);
-                        if ($out === null) {
-                            break;
-                        }
-                        $line .= $out;
-                    }
-
-                    $str = $this->readLine(4096);
-                    if ($str === false) {
-                        break;
-                    }
-
-                    $line .= $str;
-                }
 
                 // Tokenize response and assign to object properties
                 while (list($name, $value) = $this->tokenizeResponse($line, 2)) {
@@ -3721,10 +3734,9 @@ class rcube_imap_generic
 
         // Parse response
         do {
-            $line = $this->readLine(4096);
+            $line = $this->readFullLine(4096);
 
             if ($response !== null) {
-                // TODO: Better string literals handling with filter
                 if (!$filter || preg_match($filter, $line)) {
                     $response .= $line;
                 }
