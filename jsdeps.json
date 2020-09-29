@@ -14,13 +14,13 @@
     {
       "lib": "jstz",
       "name": "jsTimezoneDetect",
-      "version": "1.0.6",
-      "url": "https://bitbucket.org/pellepim/jstimezonedetect/raw/6c427658686c664da52c6a87cd62ec910baab276/dist/jstz.min.js",
+      "version": "1.0.7",
+      "url": "https://cdnjs.cloudflare.com/ajax/libs/jstimezonedetect/1.0.7/jstz.min.js",
       "dest": "program/js/jstz.min.js",
-      "sha1": "4291cd3b259d2060460c2a6ab99f428d3c0c9537",
+      "sha1": "a858ff12014b232fcc7c4c2e9f014ff852ddb917",
       "license": "MIT",
       "copyright": "Copyright (c) Jon Nylander",
-      "source": "https://bitbucket.org/pellepim/jstimezonedetect/raw/6c427658686c664da52c6a87cd62ec910baab276/dist/jstz.js"
+      "source": "https://cdnjs.cloudflare.com/ajax/libs/jstimezonedetect/1.0.7/jstz.min.js"
     },
     {
       "lib": "publickey",
@@ -36,10 +36,10 @@
     },
     {
       "lib": "tinymce",
-      "version": "4.8.2",
+      "version": "4.9.11",
       "url": "https://download.tiny.cloud/tinymce/community/tinymce_$v.zip",
       "dest": "program/js",
-      "sha1": "d7fced05acdeeb78299585ea9909b0de2b3d759d",
+      "sha1": "5f5fc32b852e587294a64be8fcb8af60258f9872",
       "license": "LGPL",
       "copyright": "Copyright (c) 1999-2015 Ephox Corp. All rights reserved",
       "rm": "program/js/tinymce",
